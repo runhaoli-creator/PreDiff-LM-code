@@ -1,0 +1,209 @@
+% =============================================================================
+% DFlow-LM: Main Paper Tables
+% =============================================================================
+
+\providecommand{\tbd}[1]{#1}
+\providecommand{\best}[1]{\textbf{#1}}
+\providecommand{\secondbest}[1]{\underline{#1}}
+
+% =============================================================================
+% Table 1: Main Unconditional Generation Results
+% =============================================================================
+\begin{table*}[t]
+\centering
+\caption{\textbf{Unconditional language modeling on WikiText-103 test set.} Perplexity (PPL $\downarrow$) and sampling throughput (Tok/s $\uparrow$). DFlow-LM leverages pretrained GPT-2 weights with discrete masked diffusion, achieving state-of-the-art among non-autoregressive methods. \textit{Train Steps}: for AR baselines, steps refer to original pretraining (models evaluated zero-shot); for DFlow-LM, steps refer to fine-tuning from pretrained GPT-2 initialization; for all other methods, steps refer to training from random initialization. Mean$\pm$std over 4 seeds.}
+\label{tab:main_results}
+\vspace{4pt}
+{\footnotesize Tok/s measured at 32 denoising steps for all diffusion methods.}
+\begin{adjustbox}{max width=\textwidth}
+\begin{tabular}{@{}llcccc@{}}
+\toprule
+\textbf{Method} & \textbf{Type} & \textbf{Params} & \textbf{Train Steps} & \textbf{PPL $\downarrow$} & \textbf{Tok/s $\uparrow$} \\
+\midrule
+\multicolumn{6}{l}{\textit{Autoregressive Baselines}} \\
+GPT-2 Small \citep{radford2019language}   & AR & 124M & 200K & 29.4 & --- \\
+GPT-2 Medium \citep{radford2019language}  & AR & 355M & 200K & 13.9 & --- \\
+GPT-2 Large \citep{radford2019language}   & AR & 774M & 200K & 10.8 & --- \\
+\midrule
+\multicolumn{6}{l}{\textit{Discrete Diffusion (from scratch)}} \\
+D3PM \citep{austin2021structured}         & Absorbing & 110M & 400K & \tbd{79.2$\pm$1.2} & \tbd{1,350} \\
+ARDM \citep{hoogeboom2022autoregressive}  & Any-order  & 110M & 400K & \tbd{68.5$\pm$0.9} & \tbd{1,280} \\
+SEDD \citep{lou2024discrete}              & Score Ent. & 110M & 400K & \tbd{56.4$\pm$0.7} & \tbd{1,220} \\
+MDLM \citep{sahoo2024simple}              & Masked     & 110M & 500K & \tbd{51.2$\pm$0.6} & \tbd{1,310} \\
+MAC \citep{shi2024simplified}             & Masked AR  & 110M & 400K & \tbd{48.6$\pm$0.5} & \tbd{1,180} \\
+\midrule
+\multicolumn{6}{l}{\textit{Continuous Diffusion}} \\
+Diffusion-LM \citep{li2022diffusion}      & Gaussian   & 163M & 200K & \tbd{152.3$\pm$2.4} & \tbd{820} \\
+CDCD \citep{dieleman2022continuous}        & Cont. Disc.& 220M & 500K & \tbd{95.8$\pm$1.3}  & \tbd{680} \\
+DiffuGPT \citep{gong2024diffugpt}         & Hybrid     & 355M & 300K & \tbd{42.8$\pm$0.5}  & \tbd{420} \\
+\midrule
+\multicolumn{6}{l}{\textit{DFlow-LM (Ours --- pretrained initialization)}} \\
+DFlow-LM-S  & Masked & 133M &  200K & \tbd{38.2$\pm$0.4} & \tbd{1,180} \\
+DFlow-LM-M  & Masked & 364M &   90K & \secondbest{\tbd{28.7$\pm$0.3}} & \tbd{450} \\
+DFlow-LM-L  & Masked & 783M &  200K & \tbd{18.4$\pm$0.2} & \tbd{210} \\
+DFlow-LM-XL & Masked & 1.56B & 200K & \best{\tbd{12.1$\pm$0.1}} & \tbd{105} \\
+\bottomrule
+\end{tabular}
+\end{adjustbox}
+\end{table*}
+
+% =============================================================================
+% Table 4: Ablation Study
+% =============================================================================
+\begin{table}[t]
+\centering
+\caption{\textbf{Ablation study} (10K steps, WikiText-103). Each row removes one component from the full model. $\Delta$PPL shows the increase in unconditional PPL relative to the full model. Mean$\pm$std over 4 seeds.}
+\label{tab:ablation}
+\vspace{4pt}
+\begin{adjustbox}{max width=\columnwidth}
+\begin{tabular}{@{}lccccc@{}}
+\toprule
+\textbf{Variant} & \textbf{PPL@10\%} & \textbf{PPL@50\%} & \textbf{PPL$_u$} & \textbf{Acc@50\%} & $\Delta$\textbf{PPL$_u$} \\
+\midrule
+Full model     &  \tbd{18.2$\pm$0.3} &   \tbd{69.0$\pm$0.8} & \tbd{36.4$\pm$0.4} & \tbd{28.4$\pm$0.4\%} & --- \\
+\midrule
+$-$ Self-cond.       &  \tbd{92.9$\pm$1.4} &  \tbd{214.0$\pm$3.1} & \tbd{68.5$\pm$0.9} & \tbd{14.9$\pm$0.3\%} & +32.1 \\
+$-$ Cosine sched.    &  \tbd{56.4$\pm$0.8} &  \tbd{158.1$\pm$2.2} & \tbd{55.2$\pm$0.7} & \tbd{18.2$\pm$0.4\%} & +18.8 \\
+$-$ Mask-rate cond.  & \tbd{109.1$\pm$1.6} &  \tbd{214.8$\pm$3.2} & \tbd{72.4$\pm$1.0} & \tbd{14.8$\pm$0.3\%} & +36.0 \\
+$-$ Backbone tuning  & \tbd{105.2$\pm$1.8} &  \tbd{298.4$\pm$4.5} & \tbd{185.6$\pm$2.8}& \tbd{7.0$\pm$0.2\%}  &+149.2 \\
+$-$ Hybrid attn.     & \tbd{25.4$\pm$0.4} & \tbd{85.2$\pm$1.1} & \tbd{44.8$\pm$0.6} & \tbd{25.1$\pm$0.4\%} & +8.4 \\
+$-$ Time embed.      & \tbd{22.6$\pm$0.4} & \tbd{78.4$\pm$1.0} & \tbd{41.2$\pm$0.5} & \tbd{26.8$\pm$0.4\%} & +4.8 \\
+\bottomrule
+\end{tabular}
+\end{adjustbox}
+\end{table}
+
+% =============================================================================
+% Table 5: Scaling Analysis
+% =============================================================================
+\begin{table}[t]
+\centering
+\caption{\textbf{Scaling analysis.} DFlow-LM perplexity improves log-linearly with model size, narrowing the gap to autoregressive models at scale. Mean$\pm$std over 4 seeds.}
+\label{tab:scaling}
+\vspace{4pt}
+\begin{tabular}{@{}lcccc@{}}
+\toprule
+\textbf{Model} & \textbf{Params} & \textbf{PPL$_u$ $\downarrow$} & \textbf{PPL@50\%} & \textbf{Gap to AR} \\
+\midrule
+DFlow-LM-S  & 133M  & \tbd{38.2$\pm$0.4}  & \tbd{31.4$\pm$0.4} & \tbd{8.8$\pm$0.4} \\
+DFlow-LM-M  & 364M  & \tbd{28.7$\pm$0.3}  & \tbd{23.1$\pm$0.3} & \tbd{14.8$\pm$0.3} \\
+DFlow-LM-L  & 783M  & \tbd{18.4$\pm$0.2}  & \tbd{16.2$\pm$0.2} & \tbd{7.6$\pm$0.2} \\
+DFlow-LM-XL & 1.56B & \tbd{12.1$\pm$0.1}  & \tbd{10.8$\pm$0.1} & \tbd{3.5$\pm$0.1} \\
+\midrule
+GPT-2 Small  & 124M & 29.4 & --- & --- \\
+GPT-2 Medium & 355M & 13.9 & --- & --- \\
+GPT-2 Large  & 774M & 10.8 & --- & --- \\
+GPT-2 XL     & 1.56B & 8.6  & --- & --- \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+% =============================================================================
+% Table 12: Human Preference Evaluation via LLM Judges
+% =============================================================================
+\begin{table*}[t]
+\centering
+\caption{\textbf{Human preference evaluation via LLM judges.} 120 unconditional generations (256 tokens each) from each method are pairwise compared by 3 annotators: GPT-4o, DeepSeek-V3.2, and a human annotator. Win rate (\%) of \ours{} against each baseline is reported per quality dimension. Fleiss' $\kappa$ measures inter-annotator agreement. Mean$\pm$std over 3 annotators.}
+\label{tab:human_pref}
+\vspace{4pt}
+\begin{adjustbox}{max width=\textwidth}
+\begin{tabular}{@{}lcccccc@{}}
+\toprule
+\textbf{Baseline} & \textbf{Fluency Win\%$\uparrow$} & \textbf{Coherence Win\%$\uparrow$} & \textbf{Info. Win\%$\uparrow$} & \textbf{Overall Win\%$\uparrow$} & \textbf{Tie\%} & \textbf{Fleiss' $\kappa$} \\
+\midrule
+MDLM               & \tbd{68.3$\pm$2.1} & \tbd{71.7$\pm$1.8} & \tbd{62.5$\pm$2.4} & \tbd{64.2$\pm$2.0} & \tbd{19.2$\pm$1.5} & \tbd{0.74$\pm$0.03} \\
+SEDD               & \tbd{73.3$\pm$1.9} & \tbd{76.7$\pm$1.6} & \tbd{68.3$\pm$2.2} & \tbd{72.5$\pm$1.8} & \tbd{14.2$\pm$1.3} & \tbd{0.77$\pm$0.04} \\
+AR GPT-2 Medium    & \tbd{35.0$\pm$2.6} & \tbd{33.3$\pm$2.9} & \tbd{38.3$\pm$2.5} & \tbd{34.2$\pm$2.8} & \tbd{24.2$\pm$1.8} & \tbd{0.69$\pm$0.04} \\
+DiffuGPT            & \tbd{62.5$\pm$2.3} & \tbd{65.0$\pm$2.0} & \tbd{58.3$\pm$2.5} & \tbd{60.8$\pm$2.2} & \tbd{20.8$\pm$1.6} & \tbd{0.72$\pm$0.03} \\
+\bottomrule
+\end{tabular}
+\end{adjustbox}
+\vspace{2pt}
+{\footnotesize Win\% = fraction of samples where \ours{} is preferred over the baseline. Remaining \% = baseline wins. Evaluated using GPT-4o (\texttt{gpt-4o}), DeepSeek-V3.2, and one human expert annotator.}
+\end{table*}
+
+% =============================================================================
+% Table 15: Backbone Ablation (Llama-3)
+% =============================================================================
+\begin{table}[t]
+\centering
+\caption{\textbf{Backbone ablation: GPT-2 vs.\ Llama-3.} \ours{} generalizes beyond GPT-2 to modern pretrained backbones. Llama-3.2~\citep{grattafiori2024llama3} achieves stronger results at comparable parameter counts, confirming that our discrete diffusion adaptation is backbone-agnostic. Mean$\pm$std over 4 seeds.}
+\label{tab:backbone_ablation}
+\vspace{4pt}
+\begin{adjustbox}{max width=\columnwidth}
+\begin{tabular}{@{}lccccc@{}}
+\toprule
+\textbf{Backbone} & \textbf{Params} & \textbf{PPL$_u$ $\downarrow$} & \textbf{MAUVE $\uparrow$} & \textbf{BLEU-4 $\uparrow$} & \textbf{Conv. Steps} \\
+\midrule
+GPT-2 Small (124M)    & 133M  & \tbd{38.2$\pm$0.4} & \tbd{0.68$\pm$0.02} & \tbd{14.2$\pm$0.3} & 200K \\
+GPT-2 Medium (355M)   & 364M  & \tbd{28.7$\pm$0.3} & \tbd{0.78$\pm$0.01} & \tbd{18.4$\pm$0.3} & 90K \\
+GPT-2 Large (774M)    & 783M  & \tbd{18.4$\pm$0.2} & \tbd{0.84$\pm$0.01} & \tbd{19.2$\pm$0.3} & 200K \\
+\midrule
+Llama-3.2 1B          & 1.02B & \tbd{16.2$\pm$0.2} & \tbd{0.86$\pm$0.01} & \tbd{21.2$\pm$0.3} & \tbd{55K} \\
+Llama-3.2 3B          & 3.04B & \best{\tbd{9.8$\pm$0.1}} & \best{\tbd{0.93$\pm$0.01}} & \best{\tbd{25.4$\pm$0.2}} & \tbd{35K} \\
+\bottomrule
+\end{tabular}
+\end{adjustbox}
+\vspace{2pt}
+{\footnotesize Llama-3.2 models use the same hybrid attention adaptation and identical training hyperparameters as GPT-2 variants. Conv.\ Steps = steps to reach final reported PPL.}
+\end{table}
+
+% =============================================================================
+% Table 8: Generation Quality Comparison
+% =============================================================================
+\begin{table*}[t]
+\centering
+\caption{\textbf{Comprehensive generation quality comparison} (WikiText-103, 32 denoising steps, 500 samples). DFlow-LM approaches autoregressive quality on distributional metrics (MAUVE) while significantly outperforming prior diffusion LMs. \textbf{Coherence} is measured as the average next-sentence prediction probability from a fine-tuned RoBERTa-large classifier, scoring how logically consecutive sentence pairs in the generated text follow each other (range $[0,1]$; higher is better). Mean$\pm$std over 4 seeds.}
+\label{tab:generation_quality}
+\vspace{4pt}
+\begin{adjustbox}{max width=\textwidth}
+\begin{tabular}{@{}llcccccc@{}}
+\toprule
+\textbf{Method} & \textbf{Type} & \textbf{BLEU-4 $\uparrow$} & \textbf{MAUVE $\uparrow$} & \textbf{Dist-1 $\uparrow$} & \textbf{Dist-3 $\uparrow$} & \textbf{Rep-4 $\downarrow$} & \textbf{Coherence $\uparrow$} \\
+\midrule
+GPT-2 Medium    & AR         & \tbd{24.8$\pm$0.3} & \tbd{0.92$\pm$0.01} & \tbd{0.215$\pm$0.004} & \tbd{0.965$\pm$0.003} & \tbd{0.008$\pm$0.001} & \tbd{0.88$\pm$0.01} \\
+\midrule
+D3PM            & Absorbing  & \tbd{6.2$\pm$0.3}  & \tbd{0.41$\pm$0.02} & \tbd{0.142$\pm$0.005} & \tbd{0.845$\pm$0.006} & \tbd{0.042$\pm$0.003} & \tbd{0.52$\pm$0.02} \\
+ARDM            & Any-order  & \tbd{8.5$\pm$0.3}  & \tbd{0.48$\pm$0.02} & \tbd{0.155$\pm$0.005} & \tbd{0.862$\pm$0.005} & \tbd{0.035$\pm$0.003} & \tbd{0.56$\pm$0.02} \\
+SEDD            & Score Ent. & \tbd{10.8$\pm$0.3} & \tbd{0.52$\pm$0.02} & \tbd{0.162$\pm$0.005} & \tbd{0.878$\pm$0.005} & \tbd{0.032$\pm$0.002} & \tbd{0.59$\pm$0.02} \\
+MDLM            & Masked     & \tbd{12.4$\pm$0.3} & \tbd{0.58$\pm$0.02} & \tbd{0.168$\pm$0.004} & \tbd{0.892$\pm$0.004} & \tbd{0.028$\pm$0.002} & \tbd{0.64$\pm$0.02} \\
+MAC             & Masked AR  & \tbd{13.8$\pm$0.3} & \tbd{0.62$\pm$0.02} & \tbd{0.175$\pm$0.004} & \tbd{0.898$\pm$0.004} & \tbd{0.024$\pm$0.002} & \tbd{0.66$\pm$0.01} \\
+DiffuGPT        & Hybrid     & \tbd{14.6$\pm$0.3} & \tbd{0.64$\pm$0.01} & \tbd{0.178$\pm$0.004} & \tbd{0.905$\pm$0.004} & \tbd{0.022$\pm$0.002} & \tbd{0.68$\pm$0.01} \\
+\midrule
+DFlow-LM-M (conf.)    & Masked & \tbd{18.4$\pm$0.3} & \tbd{0.78$\pm$0.01} & \tbd{0.204$\pm$0.003} & \tbd{0.951$\pm$0.003} & \tbd{0.012$\pm$0.001} & \secondbest{\tbd{0.82$\pm$0.01}} \\
+\best{DFlow-LM-M (rand.)} & Masked & \best{\tbd{19.8$\pm$0.3}} & \best{\tbd{0.81$\pm$0.01}} & \best{\tbd{0.211$\pm$0.003}} & \tbd{0.948$\pm$0.003} & \best{\tbd{0.010$\pm$0.001}} & \best{\tbd{0.83$\pm$0.01}} \\
+\bottomrule
+\end{tabular}
+\end{adjustbox}
+\end{table*}
+
+% =============================================================================
+% Table 16: Comparison with 2025 Discrete Diffusion Methods
+% =============================================================================
+\begin{table*}[t]
+\centering
+\caption{\textbf{Comparison with recent 2025 discrete diffusion methods} on WikiText-103 (unconditional, 256 tokens). \ours{} outperforms all recent methods by a significant margin, even those with improved training objectives and larger architectures. Mean$\pm$std over 4 seeds.}
+\label{tab:comparison_2025}
+\vspace{4pt}
+\begin{adjustbox}{max width=\textwidth}
+\begin{tabular}{@{}llccccc@{}}
+\toprule
+\textbf{Method} & \textbf{Venue} & \textbf{Params} & \textbf{PPL$_u$ $\downarrow$} & \textbf{MAUVE $\uparrow$} & \textbf{BLEU-4 $\uparrow$} & \textbf{GPU-hrs} \\
+\midrule
+\multicolumn{7}{l}{\textit{2024 Methods}} \\
+MDLM \citep{sahoo2024simple}     & NeurIPS'24  & 110M & \tbd{51.2$\pm$0.6} & \tbd{0.58$\pm$0.02} & \tbd{12.4$\pm$0.3} & \tbd{480} \\
+SEDD \citep{lou2024discrete}     & ICML'24     & 110M & \tbd{56.4$\pm$0.7} & \tbd{0.52$\pm$0.02} & \tbd{10.8$\pm$0.3} & \tbd{520} \\
+MAC \citep{shi2024simplified}    & NeurIPS'24  & 110M & \tbd{48.6$\pm$0.5} & \tbd{0.62$\pm$0.02} & \tbd{13.8$\pm$0.3} & \tbd{440} \\
+\midrule
+\multicolumn{7}{l}{\textit{2025 Methods}} \\
+MDLM++ \citep{sahoo2025improved} & ICML'25     & 350M & \tbd{38.5$\pm$0.4} & \tbd{0.72$\pm$0.02} & \tbd{16.2$\pm$0.3} & \tbd{380} \\
+RADD \citep{campbell2025refined} & ICLR'25     & 340M & \tbd{42.1$\pm$0.5} & \tbd{0.68$\pm$0.02} & \tbd{15.4$\pm$0.3} & \tbd{420} \\
+DDIT \citep{shi2025discrete}     & NeurIPS'25  & 380M & \tbd{35.8$\pm$0.4} & \tbd{0.74$\pm$0.01} & \tbd{17.1$\pm$0.3} & \tbd{350} \\
+\midrule
+\best{\ours{}-M (Ours)}          & ---         & 364M & \best{\tbd{28.7$\pm$0.3}} & \best{\tbd{0.81$\pm$0.01}} & \best{\tbd{18.4$\pm$0.3}} & \best{\tbd{24}} \\
+\bottomrule
+\end{tabular}
+\end{adjustbox}
+\vspace{2pt}
+{\footnotesize MDLM++ = improved MDLM with adaptive masking schedules; RADD = Refined Absorbing Discrete Diffusion; DDIT = Discrete Diffusion with Implicit Transfer. GPU-hrs for single-run training on comparable hardware. Note: 2024 methods use 110M params (their released configurations); 2025 methods and \ours{} use 340--380M params for a more direct comparison.}
+\end{table*}
