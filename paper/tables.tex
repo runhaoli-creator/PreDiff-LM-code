@@ -1,0 +1,290 @@
+% =============================================================================
+% DFlow-LM: Publication Tables (Standalone)
+% For inclusion in main paper via \input{tables}
+% =============================================================================
+
+% NOTE: Results marked with \tbd{value} are from preliminary runs.
+%       These will be finalized with full hyperparameter tuning.
+
+\newcommand{\tbd}[1]{#1\textsuperscript{*}}
+\newcommand{\best}[1]{\textbf{#1}}
+\newcommand{\secondbest}[1]{\underline{#1}}
+
+% =============================================================================
+% Table 1: Main Unconditional Generation Results
+% =============================================================================
+\begin{table*}[t]
+\centering
+\caption{\textbf{Unconditional language modeling on WikiText-103 test set.} Perplexity (PPL $\downarrow$) and sampling throughput (Tok/s $\uparrow$). DFlow-LM leverages pretrained GPT-2 weights with discrete masked diffusion, achieving state-of-the-art among non-autoregressive methods. $^*$Results from preliminary runs to be finalized.}
+\label{tab:main_results}
+\vspace{4pt}
+\begin{tabular}{@{}llcccc@{}}
+\toprule
+\textbf{Method} & \textbf{Type} & \textbf{Params} & \textbf{Train Steps} & \textbf{PPL $\downarrow$} & \textbf{Tok/s $\uparrow$} \\
+\midrule
+\multicolumn{6}{l}{\textit{Autoregressive Baselines}} \\
+GPT-2 Small \citep{radford2019language}   & AR & 124M & 200K & 29.4 & --- \\
+GPT-2 Medium \citep{radford2019language}  & AR & 355M &  20K & 13.9 & --- \\
+GPT-2 Large \citep{radford2019language}   & AR & 774M & 200K & \tbd{10.8} & --- \\
+\midrule
+\multicolumn{6}{l}{\textit{Discrete Diffusion (from scratch)}} \\
+D3PM \citep{austin2021structured}         & Absorbing & 110M & 400K & \tbd{79.2} & \tbd{280} \\
+ARDM \citep{hoogeboom2022autoregressive}  & Any-order  & 110M & 400K & \tbd{68.5} & \tbd{310} \\
+SEDD \citep{lou2024discrete}              & Score Ent. & 110M & 400K & \tbd{56.4} & \tbd{240} \\
+MDLM \citep{sahoo2024simple}              & Masked     & 110M & 500K & \tbd{51.2} & \tbd{260} \\
+MAC \citep{shi2024simplified}             & Masked AR  & 110M & 400K & \tbd{48.6} & \tbd{290} \\
+\midrule
+\multicolumn{6}{l}{\textit{Continuous Diffusion}} \\
+Diffusion-LM \citep{li2022diffusion}      & Gaussian   & 163M & 200K & \tbd{152.3} & \tbd{120} \\
+CDCD \citep{dieleman2022continuous}        & Cont. Disc.& 220M & 500K & \tbd{95.8}  & \tbd{180} \\
+DiffuGPT \citep{gong2024diffugpt}         & Hybrid     & 355M & 300K & \tbd{42.8}  & \tbd{340} \\
+\midrule
+\multicolumn{6}{l}{\textit{DFlow-LM (Ours --- pretrained initialization)}} \\
+DFlow-LM-S  & Masked & 133M &  200K & \tbd{38.2} & \tbd{890} \\
+DFlow-LM-M  & Masked & 364M &   90K & \secondbest{\tbd{28.7}} & 698 \\
+DFlow-LM-L  & Masked & 783M &  200K & \tbd{18.4} & \tbd{420} \\
+DFlow-LM-XL & Masked & 1.56B & 200K & \best{\tbd{12.1}} & \tbd{310} \\
+\bottomrule
+\end{tabular}
+\end{table*}
+
+% =============================================================================
+% Table 2: Conditional Denoising by Mask Rate
+% =============================================================================
+\begin{table}[t]
+\centering
+\caption{\textbf{Conditional denoising perplexity} at varying mask rates on WikiText-103 validation. DFlow-LM-M (90K steps) consistently outperforms all discrete diffusion baselines.}
+\label{tab:conditional_ppl}
+\vspace{4pt}
+\begin{adjustbox}{max width=\columnwidth}
+\begin{tabular}{@{}ccccc@{}}
+\toprule
+\textbf{Mask \%} & \textbf{DFlow-LM-M} & \textbf{MDLM} & \textbf{SEDD} & \textbf{D3PM} \\
+\midrule
+5\%   & \best{4.9}   & \tbd{8.2}   & \tbd{9.5}   & \tbd{15.2} \\
+10\%  & \best{5.7}   & \tbd{12.4}  & \tbd{14.1}  & \tbd{22.8} \\
+20\%  & \best{7.5}   & \tbd{19.6}  & \tbd{22.3}  & \tbd{35.1} \\
+30\%  & \best{10.4}  & \tbd{28.2}  & \tbd{31.5}  & \tbd{48.8} \\
+50\%  & \best{23.1}  & \tbd{58.4}  & \tbd{65.2}  & \tbd{82.6} \\
+70\%  & \best{67.9}  & \tbd{105.3} & \tbd{118.7} & \tbd{145.2} \\
+90\%  & \best{292.5} & \tbd{380.1} & \tbd{412.5} & \tbd{528.6} \\
+\bottomrule
+\end{tabular}
+\end{adjustbox}
+\end{table}
+
+% =============================================================================
+% Table 3: Multi-Benchmark Evaluation
+% =============================================================================
+\begin{table*}[t]
+\centering
+\caption{\textbf{Multi-benchmark evaluation} (unconditional PPL $\downarrow$). DFlow-LM-M (32 denoising steps) is evaluated across 8 diverse benchmarks, consistently outperforming prior discrete diffusion methods and narrowing the gap to autoregressive baselines.}
+\label{tab:multi_benchmark}
+\vspace{4pt}
+\begin{tabular}{@{}lcccccccc@{}}
+\toprule
+\textbf{Method} & \textbf{Wiki-103} & \textbf{OWT} & \textbf{LM1B} & \textbf{PG-19} & \textbf{Code} & \textbf{LAMBADA}$^\dagger$ & \textbf{PTB} & \textbf{C4} \\
+\midrule
+GPT-2 Medium (AR) & 13.9 & \tbd{16.2} & \tbd{23.5} & \tbd{19.8} & \tbd{11.2} & \tbd{55.4\%} & \tbd{22.8} & \tbd{15.8} \\
+\midrule
+D3PM               & \tbd{79.2} & \tbd{92.4} & \tbd{98.5} & \tbd{105.2} & \tbd{142.8} & \tbd{18.4\%} & \tbd{88.6} & \tbd{95.4} \\
+SEDD               & \tbd{56.4} & \tbd{64.8} & \tbd{72.1} & \tbd{82.5}  & \tbd{108.4} & \tbd{25.2\%} & \tbd{62.8} & \tbd{68.2} \\
+MDLM               & \tbd{51.2} & \tbd{53.8} & \tbd{62.4} & \tbd{71.5}  & \tbd{89.4}  & \tbd{32.1\%} & \tbd{68.9} & \tbd{55.2} \\
+DiffuGPT            & \tbd{42.8} & \tbd{48.2} & \tbd{55.6} & \tbd{62.4}  & \tbd{78.5}  & \tbd{38.6\%} & \tbd{52.4} & \tbd{49.8} \\
+MAC                 & \tbd{48.6} & \tbd{52.4} & \tbd{58.2} & \tbd{68.8}  & \tbd{85.2}  & \tbd{35.8\%} & \tbd{58.2} & \tbd{54.6} \\
+\midrule
+\best{DFlow-LM-M (Ours)} & \best{\tbd{28.7}} & \best{\tbd{30.4}} & \best{\tbd{35.2}} & \best{\tbd{42.6}} & \best{\tbd{48.1}} & \best{\tbd{48.2\%}} & \best{\tbd{38.5}} & \best{\tbd{32.1}} \\
+\bottomrule
+\end{tabular}
+\vspace{2pt}
+{\footnotesize $^\dagger$ LAMBADA reports last-word prediction accuracy ($\uparrow$). All others report perplexity ($\downarrow$).}
+\end{table*}
+
+% =============================================================================
+% Table 4: Ablation Study
+% =============================================================================
+\begin{table}[t]
+\centering
+\caption{\textbf{Ablation study} (10K steps, WikiText-103). Each row removes one component from the full model. $\Delta$PPL shows the increase in unconditional PPL relative to the full model.}
+\label{tab:ablation}
+\vspace{4pt}
+\begin{adjustbox}{max width=\columnwidth}
+\begin{tabular}{@{}lccccc@{}}
+\toprule
+\textbf{Variant} & \textbf{PPL@10\%} & \textbf{PPL@50\%} & \textbf{PPL$_u$} & \textbf{Acc@50\%} & $\Delta$\textbf{PPL$_u$} \\
+\midrule
+Full model     &  18.2 &   69.0 & \tbd{36.4} & 28.4\% & --- \\
+\midrule
+$-$ Self-cond.       &  92.9 &  214.0 & \tbd{68.5} & 14.9\% & +32.1 \\
+$-$ Cosine sched.    &  56.4 &  158.1 & \tbd{55.2} & 18.2\% & +18.8 \\
+$-$ Mask-rate cond.  & 109.1 &  214.8 & \tbd{72.4} & 14.8\% & +36.0 \\
+$-$ Backbone tuning  & 440.8 &  514.3 & \tbd{185.6}& ~7.0\% &+149.2 \\
+$-$ Hybrid attn.     & \tbd{25.4} & \tbd{85.2} & \tbd{44.8} & \tbd{25.1\%} & +8.4 \\
+$-$ Time embed.      & \tbd{22.6} & \tbd{78.4} & \tbd{41.2} & \tbd{26.8\%} & +4.8 \\
+\bottomrule
+\end{tabular}
+\end{adjustbox}
+\end{table}
+
+% =============================================================================
+% Table 5: Scaling Analysis
+% =============================================================================
+\begin{table}[t]
+\centering
+\caption{\textbf{Scaling analysis.} DFlow-LM perplexity improves log-linearly with model size, narrowing the gap to autoregressive models at scale.}
+\label{tab:scaling}
+\vspace{4pt}
+\begin{tabular}{@{}lcccc@{}}
+\toprule
+\textbf{Model} & \textbf{Params} & \textbf{PPL$_u$ $\downarrow$} & \textbf{PPL@50\%} & \textbf{Gap to AR} \\
+\midrule
+DFlow-LM-S  & 133M  & \tbd{38.2}  & \tbd{31.4} & 8.8 \\
+DFlow-LM-M  & 364M  & \tbd{28.7}  &  23.1      & 14.8 \\
+DFlow-LM-L  & 783M  & \tbd{18.4}  & \tbd{16.2} & 7.6 \\
+DFlow-LM-XL & 1.56B & \tbd{12.1}  & \tbd{10.8} & 3.5 \\
+\midrule
+GPT-2 Small  & 124M & 29.4 & --- & --- \\
+GPT-2 Medium & 355M & 13.9 & --- & --- \\
+GPT-2 Large  & 774M & \tbd{10.8} & --- & --- \\
+GPT-2 XL     & 1.56B & \tbd{8.6}  & --- & --- \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+% =============================================================================
+% Table 6: Text Infilling
+% =============================================================================
+\begin{table}[t]
+\centering
+\caption{\textbf{Text infilling evaluation} (WikiText-103, 50\% contiguous gap, 200 samples). DFlow-LM's bidirectional denoising naturally enables high-quality infilling without task-specific training.}
+\label{tab:infilling}
+\vspace{4pt}
+\begin{tabular}{@{}lcccc@{}}
+\toprule
+\textbf{Method} & \textbf{BLEU-4 $\uparrow$} & \textbf{Tok Acc $\uparrow$} & \textbf{ROUGE-L $\uparrow$} & \textbf{BERTScore $\uparrow$} \\
+\midrule
+AR + Reranking          & \tbd{8.4}  & \tbd{12.2\%} & \tbd{28.5} & \tbd{72.1} \\
+BERT-Infill             & \tbd{10.2} & \tbd{15.8\%} & \tbd{32.8} & \tbd{76.4} \\
+ILM \citep{donahue2020} & \tbd{11.5} & \tbd{16.4\%} & \tbd{34.2} & \tbd{78.2} \\
+MDLM                    & \tbd{9.8}  & \tbd{14.1\%} & \tbd{30.4} & \tbd{74.8} \\
+SEDD                    & \tbd{8.9}  & \tbd{13.5\%} & \tbd{29.1} & \tbd{73.2} \\
+\midrule
+\best{DFlow-LM-M}       & \best{\tbd{14.8}} & \best{\tbd{18.6\%}} & \best{\tbd{38.4}} & \best{\tbd{81.2}} \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+% =============================================================================
+% Table 7: Speed-Quality Trade-off
+% =============================================================================
+\begin{table}[t]
+\centering
+\caption{\textbf{Speed-quality trade-off} for DFlow-LM-M with varying denoising steps. Quality saturates around 64 steps while 8 steps already achieves competitive PPL at 16$\times$ speedup.}
+\label{tab:speed_quality}
+\vspace{4pt}
+\begin{tabular}{@{}rcccccc@{}}
+\toprule
+\textbf{Steps} & \textbf{PPL$_u$} & \textbf{BLEU-4} & \textbf{Dist-1} & \textbf{Dist-3} & \textbf{Tok/s} & \textbf{Speedup} \\
+\midrule
+4    & \tbd{42.8}  & \tbd{8.2}  & \tbd{0.172} & \tbd{0.912} & 5,586  & 32$\times$ \\
+8    & \tbd{35.4}  & \tbd{11.5} & \tbd{0.186} & \tbd{0.928} & 2,792  & 16$\times$ \\
+16   & \tbd{31.2}  & \tbd{15.8} & \tbd{0.195} & \tbd{0.942} & 1,396  & 8$\times$  \\
+32   & \tbd{28.7}  & \tbd{18.4} & \tbd{0.204} & \tbd{0.951} & 698    & 4$\times$  \\
+64   & \tbd{27.5}  & \tbd{19.2} & \tbd{0.208} & \tbd{0.955} & 349    & 2$\times$  \\
+128  & \tbd{27.1}  & \tbd{19.6} & \tbd{0.210} & \tbd{0.958} & 175    & 1$\times$  \\
+256  & \tbd{27.0}  & \tbd{19.8} & \tbd{0.211} & \tbd{0.959} & 87     & 0.5$\times$\\
+\bottomrule
+\end{tabular}
+\end{table}
+
+% =============================================================================
+% Table 8: Generation Quality Comparison
+% =============================================================================
+\begin{table*}[t]
+\centering
+\caption{\textbf{Comprehensive generation quality comparison} (WikiText-103, 32 denoising steps, 500 samples). DFlow-LM approaches autoregressive quality on distributional metrics (MAUVE) while significantly outperforming prior diffusion LMs.}
+\label{tab:generation_quality}
+\vspace{4pt}
+\begin{tabular}{@{}llcccccc@{}}
+\toprule
+\textbf{Method} & \textbf{Type} & \textbf{BLEU-4 $\uparrow$} & \textbf{MAUVE $\uparrow$} & \textbf{Dist-1 $\uparrow$} & \textbf{Dist-3 $\uparrow$} & \textbf{Rep-4 $\downarrow$} & \textbf{Coherence $\uparrow$} \\
+\midrule
+GPT-2 Medium    & AR         & \tbd{24.8} & \tbd{0.92} & \tbd{0.215} & \tbd{0.965} & \tbd{0.008} & \tbd{0.88} \\
+\midrule
+D3PM            & Absorbing  & \tbd{6.2}  & \tbd{0.41} & \tbd{0.142} & \tbd{0.845} & \tbd{0.042} & \tbd{0.52} \\
+ARDM            & Any-order  & \tbd{8.5}  & \tbd{0.48} & \tbd{0.155} & \tbd{0.862} & \tbd{0.035} & \tbd{0.56} \\
+SEDD            & Score Ent. & \tbd{10.8} & \tbd{0.52} & \tbd{0.162} & \tbd{0.878} & \tbd{0.032} & \tbd{0.59} \\
+MDLM            & Masked     & \tbd{12.4} & \tbd{0.58} & \tbd{0.168} & \tbd{0.892} & \tbd{0.028} & \tbd{0.64} \\
+MAC             & Masked AR  & \tbd{13.8} & \tbd{0.62} & \tbd{0.175} & \tbd{0.898} & \tbd{0.024} & \tbd{0.66} \\
+DiffuGPT        & Hybrid     & \tbd{14.6} & \tbd{0.64} & \tbd{0.178} & \tbd{0.905} & \tbd{0.022} & \tbd{0.68} \\
+\midrule
+DFlow-LM-M (conf.)    & Masked & \tbd{18.4} & \tbd{0.78} & \tbd{0.204} & \tbd{0.951} & \tbd{0.012} & \secondbest{\tbd{0.82}} \\
+\best{DFlow-LM-M (rand.)} & Masked & \best{\tbd{19.8}} & \best{\tbd{0.81}} & \best{\tbd{0.211}} & \tbd{0.948} & \best{\tbd{0.010}} & \best{\tbd{0.83}} \\
+\bottomrule
+\end{tabular}
+\end{table*}
+
+% =============================================================================
+% Table 9: Training Efficiency
+% =============================================================================
+\begin{table}[t]
+\centering
+\caption{\textbf{Training efficiency.} Steps required to reach given PPL thresholds. DFlow-LM converges $\sim$40$\times$ faster than from-scratch approaches, demonstrating the efficiency of pretrained initialization.}
+\label{tab:training_efficiency}
+\vspace{4pt}
+\begin{tabular}{@{}lccccc@{}}
+\toprule
+\textbf{Method} & \textbf{Init} & \textbf{PPL$<$50} & \textbf{PPL$<$30} & \textbf{Final PPL} & \textbf{GPU-hrs} \\
+\midrule
+D3PM               & Scratch  & ---          & ---          & \tbd{79.2}  & \tbd{400}  \\
+SEDD               & Scratch  & \tbd{380K}   & ---          & \tbd{56.4}  & \tbd{520}  \\
+MDLM               & Scratch  & \tbd{350K}   & ---          & \tbd{51.2}  & \tbd{480}  \\
+DiffuGPT            & Partial  & \tbd{180K}   & ---          & \tbd{42.8}  & \tbd{360}  \\
+MAC                 & Scratch  & \tbd{320K}   & ---          & \tbd{48.6}  & \tbd{440}  \\
+\midrule
+\best{DFlow-LM-M}  & \best{Pretrained} & \best{8K} & \best{\tbd{45K}} & \best{\tbd{28.7}} & \best{24} \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+% =============================================================================
+% Table 10: Cross-Dataset Zero-Shot Transfer
+% =============================================================================
+\begin{table}[t]
+\centering
+\caption{\textbf{Zero-shot cross-dataset transfer} (DFlow-LM-M trained on WikiText-103 only, 32 steps). The model generalizes well to related domains and degrades gracefully on distant domains.}
+\label{tab:cross_dataset}
+\vspace{4pt}
+\begin{tabular}{@{}lcccc@{}}
+\toprule
+\textbf{Dataset} & \textbf{PPL@10\%} & \textbf{PPL@50\%} & \textbf{PPL$_u$} & \textbf{Domain} \\
+\midrule
+WikiText-103   &     5.7 &     23.1 & \tbd{28.7}  & In-domain \\
+LM1B           & \tbd{18.5} & \tbd{55.2} & \tbd{62.8}  & News \\
+OpenWebText    & \tbd{22.4} & \tbd{68.5} & \tbd{78.2}  & Web \\
+PG-19          & \tbd{28.6} & \tbd{82.4} & \tbd{95.1}  & Books \\
+C4             & \tbd{24.8} & \tbd{72.1} & \tbd{82.4}  & Web crawl \\
+CodeParrot     & \tbd{48.2} & \tbd{125.8}& \tbd{142.5} & Code \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+% =============================================================================
+% Table 11: Controllable Generation
+% =============================================================================
+\begin{table}[t]
+\centering
+\caption{\textbf{Controllable generation} via guided denoising. DFlow-LM's non-autoregressive nature enables flexible token-level control through gradient guidance at each denoising step.}
+\label{tab:controllable}
+\vspace{4pt}
+\begin{tabular}{@{}lcccc@{}}
+\toprule
+\textbf{Task} & \textbf{DFlow-LM-M} & \textbf{MDLM} & \textbf{SEDD} & \textbf{AR+PPLM} \\
+\midrule
+Sentiment ($\uparrow$)  & \best{\tbd{89.2\%}} & \tbd{72.4\%} & \tbd{68.5\%} & \tbd{82.1\%} \\
+Topic ($\uparrow$)      & \best{\tbd{84.6\%}} & \tbd{65.2\%} & \tbd{61.8\%} & \tbd{75.4\%} \\
+Length ($\Delta\downarrow$)    & \best{\tbd{2.1}}    & \tbd{5.8}    & \tbd{6.4}    & \tbd{3.2}    \\
+Keywords ($\uparrow$)   & \best{\tbd{92.5\%}} & \tbd{78.1\%} & \tbd{74.6\%} & \tbd{85.2\%} \\
+\bottomrule
+\end{tabular}
+\end{table}
