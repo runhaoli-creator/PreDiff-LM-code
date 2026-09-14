@@ -1,0 +1,50 @@
+# ──────────────────────────────────────────────────────────────────────
+# DFlow-LM: Smoke test config (GPT-2 Medium, 200 steps, real data)
+# For verifying loss decrease before launching full training
+# ──────────────────────────────────────────────────────────────────────
+
+model_type: dflow
+
+model:
+  backbone_name: gpt2-medium
+  freeze_backbone: false
+  freeze_backbone_layers: 0
+  gradient_checkpointing: true
+
+  mask_schedule: cosine
+  self_conditioning: true
+  self_cond_prob: 0.5
+
+  loss_weighting: uniform
+  label_smoothing: 0.0
+
+  inject_mask_rate: true
+  time_embed_max_period: 10000.0
+  max_prompt_len: 256
+  max_target_len: 256
+
+training:
+  run_name: dflow_smoke_test
+  output_dir: runs/dflow/smoke_test
+  seed: 42
+
+  dataset: wikitext103
+  max_length: 512
+  prompt_ratio: 0.5
+  batch_size: 8
+  num_workers: 0
+
+  lr: 0.00005
+  weight_decay: 0.01
+  warmup_steps: 50
+  max_steps: 200
+  grad_clip: 1.0
+  accumulation_steps: 1
+
+  log_every: 10
+  eval_every: 100
+  save_every: 100
+  use_wandb: false
+  eval_max_batches: 10
+
+  mixed_precision: bf16

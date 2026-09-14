@@ -1,0 +1,52 @@
+# ──────────────────────────────────────────────────────────────────────
+# DFlow-LM: Masked Diffusion with GPT-2 Large backbone
+# WikiText-103 dataset, 200K steps
+# ──────────────────────────────────────────────────────────────────────
+
+model_type: dflow
+
+model:
+  backbone_name: gpt2-large
+  freeze_backbone: false
+  freeze_backbone_layers: 0
+  gradient_checkpointing: true
+
+  mask_schedule: cosine
+  self_conditioning: true
+  self_cond_prob: 0.5
+
+  loss_weighting: uniform
+  label_smoothing: 0.0
+
+  inject_mask_rate: true
+  time_embed_max_period: 10000.0
+
+  max_prompt_len: 256
+  max_target_len: 256
+
+training:
+  run_name: dflow_gpt2large_wikitext
+  output_dir: runs/dflow/dflow_gpt2large_wikitext
+  seed: 42
+
+  dataset: wikitext103
+  max_length: 512
+  prompt_ratio: 0.5
+  batch_size: 8
+  num_workers: 0
+
+  lr: 0.00003
+  weight_decay: 0.01
+  warmup_steps: 3000
+  max_steps: 200000
+  grad_clip: 1.0
+  accumulation_steps: 4           # effective batch size = 8 * 8 * 4 = 256
+
+  log_every: 50
+  eval_every: 2000
+  save_every: 10000
+  use_wandb: false
+  eval_max_batches: 50
+  elbo_time_steps: 64
+
+  mixed_precision: bf16
